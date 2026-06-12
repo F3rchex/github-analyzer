@@ -1,5 +1,6 @@
 import requests
 #importamos libreria para peticiones HTTP
+import json
 
 from src.config import GITHUB_TOKEN, GITHUB_API_URL
 
@@ -18,7 +19,11 @@ class GitHubClient:
         try:
             response = requests.get(url, headers=self.headers)
             response.raise_for_status()
-            return response.json()
+            repo_json = response.json()
+            repo_json['owner'] = owner
+            repo_json['repo_name'] = repo_name
+            self.save_json(repo_json)
+            return repo_json
         except requests.exceptions.RequestException as e:
             print(f'Error al obtener información del repositorio {e}')
             return None
@@ -33,3 +38,39 @@ class GitHubClient:
         except requests.exceptions.RequestException as e:
             print(f'No se pudieron obtener los lenguajes del repositorio')
             return None
+        
+        
+    def save_json(self, repo_data):
+        file_path = "data_response.json"
+        try:
+            #Primero intentamos leer los datos existentes, si hay.
+            with open(file_path, "r") as file:
+                repo_list = json.load(file)
+        except FileNotFoundError, json.JSONDecodeError:
+            repo_list = []
+        #obtenemos el nombre y propietario del repositorio para ver si ya esta en el archivo  
+        repo_id = f'{repo_data.get('owner')}/{repo_data.get('name')}'
+        existing_repo = [repo for repo in repo_list if f'{repo.get('owner')}/{repo.get('name')}' == repo_id]
+        
+        if existing_repo:
+            repo_list.remove(existing_repo[0])
+            repo_list.append(repo_data)
+            print(f'Repositorio {repo_id} actualizado.')
+        else:
+            repo_list.append(repo_data)
+            print(f'Repositorio {repo_id} agregado correctamente.')
+        
+        
+        #Guardamos todos los datos  
+        with open(file_path, "w") as file:
+            json.dump(repo_list, file, indent=4)
+            
+        
+            
+    # def load_json(self, response):
+    #     file_response = "data_response.json"
+    #     with open(file_response, "r") as file:
+    #         recovered_data = json.load(file)
+    #         file_response.clear()
+    #         file_response.extend(recovered_data)
+    #     print(f"Datos recuperados")

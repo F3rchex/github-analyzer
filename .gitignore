@@ -27,3 +27,6 @@ Thumbs.db
 build/
 dist/
 *.egg-info/
+
+# Archivo donde se guardan los registros
+data_response.json
