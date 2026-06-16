@@ -12,7 +12,7 @@ def buscar_repositorio():
     
     #obtener informacion del repo
     print(f'\nObteniendo información de {owner}/{repo_name}...\n')
-    repo_info = client.get_repo_info(owner, repo_name)
+    repo_info = client.save_repository(owner, repo_name) #Llama a get_repo_info para buscar y guardar
     
     #verificamos si hubo error
     if repo_info is None:

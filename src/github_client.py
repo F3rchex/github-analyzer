@@ -14,19 +14,28 @@ class GitHubClient:
         }
         
     def get_repo_info(self, owner, repo_name):
+        # Solo busca información, NO guarda
         url = f'{self.base_url}/repos/{owner}/{repo_name}'
-        
+
         try:
             response = requests.get(url, headers=self.headers)
             response.raise_for_status()
-            repo_json = response.json()
-            repo_json['owner'] = owner
-            repo_json['repo_name'] = repo_name
-            self.save_json(repo_json)
-            return repo_json
+            return response.json()
         except requests.exceptions.RequestException as e:
             print(f'Error al obtener información del repositorio {e}')
             return None
+
+    def save_repository(self, owner, repo_name):
+        # Busca Y guarda el repositorio
+        repo_data = self.get_repo_info(owner, repo_name)
+
+        if repo_data:
+            repo_data['owner'] = owner
+            repo_data['repo_name'] = repo_name
+            self.save_json(repo_data)
+            return repo_data
+
+        return None
         
         
     def get_repo_languages(self, owner, repo_name):
@@ -46,7 +55,7 @@ class GitHubClient:
             #Primero intentamos leer los datos existentes, si hay.
             with open(file_path, "r") as file:
                 repo_list = json.load(file)
-        except FileNotFoundError, json.JSONDecodeError:
+        except (FileNotFoundError, json.JSONDecodeError):
             repo_list = []
         #obtenemos el nombre y propietario del repositorio para ver si ya esta en el archivo  
         repo_id = f'{repo_data.get('owner')}/{repo_data.get('name')}'
