@@ -41,7 +41,7 @@ class GitHubClient:
         
         
     def save_json(self, repo_data):
-        file_path = "data_response.json"
+        file_path = "data/repositories.json"
         try:
             #Primero intentamos leer los datos existentes, si hay.
             with open(file_path, "r") as file:

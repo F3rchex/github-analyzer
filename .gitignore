@@ -29,4 +29,5 @@ dist/
 *.egg-info/
 
 # Archivo donde se guardan los registros
-data_response.json
+data/
+CHEATSHEET_OPENAI.md

@@ -1,6 +1,7 @@
 from src.github_client import GitHubClient
+from src.chat_service import ChatService
 
-def main():
+def buscar_repositorio():
     #creamos instancia del cliente
     client = GitHubClient()
     
@@ -36,7 +37,64 @@ def main():
     else:
         print(f'No se pudieron obtener los lenguajes')
         
+
+
+
+def consultar_chatbot():
+    service = ChatService()
+    
+    print(f"\nIniciando conversación... ")
+    
+    #Iniciar conversación (carga repos y construye contexto)
+    service.start_conversation()
+    print("Listo, escribe 'salir' para terminar la conversación\n")
+    
+    #Loop de conversación
+    while True:
+        user_input = input("Tú: ")
         
+        if user_input.lower() in ['salir', 'exit', 'fin', 'quit']:
+            print(f"\nCerrando chat...")
+            service.save_conversation()
+            break
+        
+        if not user_input.strip():
+            continue
+        
+        print(f"Bot: ", end='', flush=True)
+        for chunk in service.chat(user_input):
+            print(chunk, end='', flush=True )
+        print(f"\n")    #Nueva linea de respuesta
+    
+    
+    
+    
+    
+    
+    
+    
+def main():
+    while True:
+        print(f"=== ¿Que quieres realizar? ===\n")
+        print(f"1. Buscar información de repositorio\n")
+        print(f"2. Consultar con Chatbot\n")
+        print(f"0. SALIR\n")
+        try:
+            opcion = int(input("Elige una opción\n"))
+            match opcion:
+                case 1:
+                    buscar_repositorio()
+                case 2:
+                    consultar_chatbot()
+                case 0:
+                    break
+                case __:
+                    print(f"La opción no es valida")
+        except ValueError:
+            print(f"El formato debe ser un numero, por favor intentelo de nuevo")
+        
+        
+                  
 if __name__ == '__main__':
     main()
     
