@@ -12,8 +12,14 @@ class GitHubClient:
             #opcional pero es buena practica indicar el formato de respuesta
             'Accept': 'application/vnd.github.v3+json'
         }
+        self.request_made = 0
+        self.max_requests = 100 #limite por sesión
         
     def get_repo_info(self, owner, repo_name):
+        if self.request_made >= self.max_requests:
+            raise Exception("Limite de request alcanzado")
+        self.request_made += 1
+        
         # Solo busca información, NO guarda
         url = f'{self.base_url}/repos/{owner}/{repo_name}'
 
