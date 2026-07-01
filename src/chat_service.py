@@ -2,6 +2,7 @@ import json
 from src.openai_client import OpenAIClient
 from datetime import datetime
 from src.github_client import GitHubClient
+from src.scraper import GitHubScraper
 
 class ChatService:
     def __init__(self):
@@ -9,6 +10,7 @@ class ChatService:
         #historial de conversacion
         self.messages = []
         self.github_client = GitHubClient()
+        self.scraper = GitHubScraper()
         
     def load_repositories(self):
         file_path = "data/repositories.json"
@@ -183,6 +185,27 @@ class ChatService:
                             "required": ["owner", "repo_name"]
                         }
                     }
+                },
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "get_trending_repos",
+                        "description": "Devuelve el trending de repositorios de Github.",
+                        "parameters": {
+                            "type": "object",
+                            "properties": {
+                                "language": {
+                                    "type":"string",
+                                    "description": "El lenguaje del que se quiere obtener el trending, si esta vacio se devuelve de todos los lenguajes.)"
+                                },
+                                "since":{
+                                    "type": "string",
+                                    "description": "El periodo del que se desea el trending: diario/daily, weekly/semanal, monthly/mensual"
+                                }
+                                },
+                            "required": [] #Son opcionales
+                        }
+                    }
                 }
         ]
         
@@ -196,6 +219,9 @@ class ChatService:
             return result
         elif function_name == "save_repository":
             result = self.github_client.save_repository(arguments["owner"], arguments["repo_name"])
+            return result
+        elif function_name == "get_trending_repos":
+            result = self.scraper.get_trending_repos(language=arguments.get("language", ""), since=arguments.get("since", "daily"))
             return result
         else:
             return {"error": f"Función {function_name} no encontrada"}

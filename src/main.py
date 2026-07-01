@@ -1,5 +1,6 @@
 from src.github_client import GitHubClient
 from src.chat_service import ChatService
+from src.scraper import GitHubScraper
 
 def buscar_repositorio():
     #creamos instancia del cliente
@@ -67,7 +68,22 @@ def consultar_chatbot():
         print(f"\n")    #Nueva linea de respuesta
     
     
+def ver_trending():
+    scraper = GitHubScraper()
+    #Si se deja en blanco buscara de todos los lenguajes
+    language = str(input("\nIntroduce el lenguaje del que quieres obtener el trending, si deseas todos los lenguajes dejalo vacio.\n"))
+    since = "daily"
     
+    print("🔥 \nREPOSITORIOS EN TENDENCIA HOY\n")
+    trending = scraper.get_trending_repos(language, since)
+    
+    for i, repo in enumerate(trending, 1):
+        print(f"{i}. {repo['full_name']}")
+        print(f"   📝 {repo['description']}")
+        print(f"   💻 {repo['language']}")
+        print(f"   🔗 {repo['url']}")
+        print()
+      
     
     
     
@@ -78,6 +94,7 @@ def main():
         print(f"=== ¿Que quieres realizar? ===\n")
         print(f"1. Buscar información de repositorio\n")
         print(f"2. Consultar con Chatbot\n")
+        print(f"3. Obtener repositorios en tendencia (Scraping)\n")
         print(f"0. SALIR\n")
         try:
             opcion = int(input("Elige una opción\n"))
@@ -86,6 +103,8 @@ def main():
                     buscar_repositorio()
                 case 2:
                     consultar_chatbot()
+                case 3:
+                    ver_trending()
                 case 0:
                     break
                 case __:
